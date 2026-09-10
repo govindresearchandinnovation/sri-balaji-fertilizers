@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "products": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "slides": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "orders": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    }
+  }
+}
