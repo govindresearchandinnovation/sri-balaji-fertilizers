@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | Sri Balaji Fertilizers</title>
+  <style>
+    :root {
+      --primary: #2e7d32;
+      --danger: #d32f2f;
+      --bg: #f8faf9;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background-color: var(--bg); color: #333; }
+
+    /* Login Screen */
+    #authOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .auth-box {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      width: 320px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    .auth-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 15px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    /* Admin Nav */
+    header {
+      background: #1b5e20;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .view-site-btn {
+      background: #ffffff;
+      color: #1b5e20;
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    /* Layout */
+    .dashboard {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+    .panel-card {
+      background: var(--card);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 24px;
+    }
+    h2 { margin-bottom: 18px; font-size: 1.3rem; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; }
+
+    /* Forms */
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .full-width { grid-column: 1 / -1; }
+    input, select, textarea {
+      width: 100%;
+      padding: 9px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+    button.btn-save {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #e0e0e0; padding: 10px; text-align: left; vertical-align: middle; }
+    th { background: #f0f3f1; }
+    .thumbnail { width: 50px; height: 40px; object-fit: cover; border-radius: 4px; }
+    .btn-delete {
+      background: var(--danger);
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Authentication Overlay -->
+  <div id="authOverlay">
+    <div class="auth-box">
+      <h3>Admin Authentication</h3>
+      <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Default PIN: <b>1234</b></p>
+      <input type="password" id="pinInput" placeholder="Enter Access PIN" />
+      <button class="btn-save" style="width: 100%;" onclick="verifyPin()">Unlock Dashboard</button>
+    </div>
+  </div>
+
+  <header>
+    <div>🌿 <b>Sri Balaji Fertilizers — Admin Panel</b></div>
+    <a href="index.html" class="view-site-btn" target="_blank">View Live Shop &rarr;</a>
+  </header>
+
+  <div class="dashboard">
+
+    <!-- Section 1: Slideshow Management -->
+    <div class="panel-card">
+      <h2>1. Home Page Slideshow Images</h2>
+      <form id="slideForm" onsubmit="addSlide(event)">
+        <input type="url" id="slideUrl" placeholder="Image URL (e.g. https://...)" required />
+        <input type="text" id="slideCaption" placeholder="Caption / Tagline" />
+        <button type="submit" class="btn-save">+ Add Slide</button>
+      </form>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Preview</th>
+            <th>Caption</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="slideTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Section 2: Products Management -->
+    <div class="panel-card">
+      <h2>2. Product Catalog (Fertilizers & Pesticides)</h2>
+      <form id="productForm" onsubmit="addProduct(event)">
+        <input type="text" id="prodName" placeholder="Product Name (e.g., Urea 45kg)" required />
+        <select id="prodCategory" required>
+          <option value="Fertilizer">Fertilizer</option>
+          <option value="Pesticide">Pesticide</option>
+        </select>
+        <input type="number" id="prodPrice" placeholder="Price (₹)" min="0" required />
+        <input type="url" id="prodImg" placeholder="Product Image URL" required />
+        <textarea id="prodDesc" class="full-width" rows="2" placeholder="Product description, active chemicals, or crop benefits..."></textarea>
+        <button type="submit" class="btn-save full-width">+ Add Product</button>
+      </form>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Product Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="productTable"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script>
+    function verifyPin() {
+      const pin = document.getElementById('pinInput').value;
+      if (pin === '1234') {
+        document.getElementById('authOverlay').style.display = 'none';
+      } else {
+        alert('Incorrect PIN. Default is 1234');
+      }
+    }
+
+    function getStored(key) {
+      return JSON.parse(localStorage.getItem(key)) || [];
+    }
+    function setStored(key, data) {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    /* === Slideshow Functions === */
+    function renderAdminSlides() {
+      const slides = getStored('agro_slides');
+      const tbody = document.getElementById('slideTable');
+      tbody.innerHTML = '';
+
+      slides.forEach((slide, index) => {
+        tbody.innerHTML += `
+          <tr>
+            <td><img src="${slide.url}" class="thumbnail" alt="Slide" onerror="this.src='https://via.placeholder.com/50'"/></td>
+            <td>${slide.caption || '<em>No caption</em>'}</td>
+            <td><button class="btn-delete" onclick="deleteSlide(${index})">Delete</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    function addSlide(e) {
+      e.preventDefault();
+      const url = document.getElementById('slideUrl').value.trim();
+      const caption = document.getElementById('slideCaption').value.trim();
+
+      const slides = getStored('agro_slides');
+      slides.push({ url, caption });
+      setStored('agro_slides', slides);
+
+      document.getElementById('slideForm').reset();
+      renderAdminSlides();
+    }
+
+    function deleteSlide(index) {
+      if (confirm('Are you sure you want to remove this slide?')) {
+        const slides = getStored('agro_slides');
+        slides.splice(index, 1);
+        setStored('agro_slides', slides);
+        renderAdminSlides();
+      }
+    }
+
+    /* === Products Functions === */
+    function renderAdminProducts() {
+      const products = getStored('agro_products');
+      const tbody = document.getElementById('productTable');
+      tbody.innerHTML = '';
+
+      products.forEach((prod, index) => {
+        tbody.innerHTML += `
+          <tr>
+            <td><img src="${prod.img}" class="thumbnail" alt="${prod.name}" onerror="this.src='https://via.placeholder.com/50'"/></td>
+            <td><strong>${prod.name}</strong><br><small style="color:#666">${prod.desc ? prod.desc.substring(0, 45) + '...' : ''}</small></td>
+            <td>${prod.category}</td>
+            <td>₹${prod.price}</td>
+            <td><button class="btn-delete" onclick="deleteProduct(${index})">Delete</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    function addProduct(e) {
+      e.preventDefault();
+      const name = document.getElementById('prodName').value.trim();
+      const category = document.getElementById('prodCategory').value;
+      const price = parseFloat(document.getElementById('prodPrice').value);
+      const img = document.getElementById('prodImg').value.trim();
+      const desc = document.getElementById('prodDesc').value.trim();
+
+      const products = getStored('agro_products');
+      products.push({ id: Date.now(), name, category, price, img, desc });
+      setStored('agro_products', products);
+
+      document.getElementById('productForm').reset();
+      renderAdminProducts();
+    }
+
+    function deleteProduct(index) {
+      if (confirm('Delete this product from catalog?')) {
+        const products = getStored('agro_products');
+        products.splice(index, 1);
+        setStored('agro_products', products);
+        renderAdminProducts();
+      }
+    }
+
+    renderAdminSlides();
+    renderAdminProducts();
+  </script>
+</body>
+</html>
