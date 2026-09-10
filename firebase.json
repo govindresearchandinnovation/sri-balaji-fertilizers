@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "sri-balaji-fertilizers-b521a": {
+      "database": {
+        "rules": "database.rules.json"
+      },
+      "storage": {
+        "rules": "storage.rules"
+      }
+    }
+  }
+}
